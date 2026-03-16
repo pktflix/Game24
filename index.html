@@ -1,109 +1,159 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-<meta charset="UTF-8">
-<title>মনোপলি বোর্ড প্রোটোটাইপ</title>
-<style>
-body { font-family: Arial, sans-serif; text-align: center; background: #f0f0f0; }
-#board {
-  width: 600px;             /* ছবি অনুযায়ী পরিবর্তন করো */
-  height: 600px;
-  margin: 20px auto;
-  background-image: url('https://static-01.daraz.com.bd/p/aba8495ed13118c2fc58119f5882750d.jpg'); /* এখানে তোমার ছবি রাখবে */
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  border: 2px solid #333;
-}
-.player {
-  width: 20px;
-  height: 20px;
-  background: red;
-  border-radius: 50%;
-  position: absolute;
-  transition: all 0.5s ease; /* smooth movement */
-}
-#dice { font-size: 16px; padding: 10px 20px; margin: 15px; cursor: pointer; }
-#info { margin-top: 10px; font-size: 14px; }
-</style>
+  <meta charset="UTF-8">
+  <title>মনোপলি গেম</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #f0f0f0; }
+    #board {
+      width: 600px;
+      height: 600px;
+      margin: 20px auto;
+      background-image: url('https://static-01.daraz.com.bd/p/aba8495ed13118c2fc58119f5882750d.jpg');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      border: 2px solid #333;
+    }
+    .player {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      position: absolute;
+      transition: all 0.5s ease;
+    }
+    #dice {
+      font-size: 16px;
+      padding: 10px 20px;
+      margin: 15px;
+      cursor: pointer;
+      background: #f8a5c2;
+      border: none;
+      border-radius: 8px;
+    }
+    #dice:active {
+      transform: scale(0.95);
+    }
+    #info {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    /* ৩D ডাইস স্টাইল */
+    .dice {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      background-color: #f8a5c2;
+      border-radius: 8px;
+      position: relative;
+      margin: 10px;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .dice:active {
+      transform: rotateY(180deg);
+    }
+
+    .dice-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .player1 { background-color: red; }
+    .player2 { background-color: blue; }
+    .player3 { background-color: green; }
+    .player4 { background-color: yellow; }
+  </style>
 </head>
 <body>
 
-<h1>মনোপলি বোর্ড প্রোটোটাইপ</h1>
-<div id="board">
-  <div id="player" class="player"></div>
-</div>
-<button id="dice">ডাইস নাড়ুন</button>
-<div id="info">ডাইস রোল: <span id="diceNum">0</span></div>
+  <h1>মনোপলি গেম</h1>
+  <div id="board">
+    <div id="player1" class="player player1"></div>
+    <div id="player2" class="player player2"></div>
+    <div id="player3" class="player player3"></div>
+    <div id="player4" class="player player4"></div>
+  </div>
 
-<script>
-// প্রতিটি ঘরের x,y কো-অর্ডিনেট (600px board ধরছি)
-const positions = [
-  {x: 560, y: 560}, // Start (নিচের ডান কোণ)
-  {x: 500, y: 560}, // Mediterranean Avenue
-  {x: 440, y: 560}, // Community Chest
-  {x: 380, y: 560}, // Baltic Avenue
-  {x: 320, y: 560}, // Income Tax
-  {x: 260, y: 560}, // Reading Railroad
-  {x: 200, y: 560}, // Oriental Avenue
-  {x: 140, y: 560}, // Chance
-  {x: 80, y: 560},  // Vermont Avenue
-  {x: 20, y: 560},  // Connecticut Avenue
-  {x: 0, y: 500},   // Jail / Just Visiting
-  {x: 0, y: 440},   // St. Charles Place
-  {x: 0, y: 380},   // Electric Company
-  {x: 0, y: 320},   // States Avenue
-  {x: 0, y: 260},   // Virginia Avenue
-  {x: 0, y: 200},   // Pennsylvania Railroad
-  {x: 0, y: 140},   // St. James Place
-  {x: 0, y: 80},    // Community Chest
-  {x: 0, y: 20},    // Tennessee Avenue
-  {x: 0, y: 0},     // New York Avenue (উপরে বাম)
-  {x: 60, y: 0},    // Free Parking
-  {x: 120, y: 0},   // Kentucky Avenue
-  {x: 180, y: 0},   // Chance
-  {x: 240, y: 0},   // Indiana Avenue
-  {x: 300, y: 0},   // Illinois Avenue
-  {x: 360, y: 0},   // B&O Railroad
-  {x: 420, y: 0},   // Atlantic Avenue
-  {x: 480, y: 0},   // Ventnor Avenue
-  {x: 540, y: 0},   // Water Works
-  {x: 560, y: 0},   // Marvin Gardens
-  {x: 580, y: 60},  // Go To Jail
-  {x: 580, y: 120}, // Pacific Avenue
-  {x: 580, y: 180}, // North Carolina Avenue
-  {x: 580, y: 240}, // Community Chest
-  {x: 580, y: 300}, // Pennsylvania Avenue
-  {x: 580, y: 360}, // Short Line
-  {x: 580, y: 420}, // Chance
-  {x: 580, y: 480}, // Park Place
-  {x: 580, y: 540}, // Luxury Tax
-  {x: 560, y: 560}  // Boardwalk (ফিরে Start)
-];
+  <button id="dice">
+    <div class="dice">
+      <div class="dice-face" id="diceFace"></div>
+    </div>
+    ডাইস রোল
+  </button>
 
-let playerPos = 0;
-const player = document.getElementById('player');
+  <div id="info">ডাইস রোল: <span id="diceNum">0</span></div>
+  <div id="status">আপনি কোথায় আছেন?</div>
 
-function movePlayer() {
-  const pos = positions[playerPos];
-  player.style.left = pos.x + 'px';
-  player.style.top = pos.y + 'px';
-}
+  <script>
+    const positions = [
+      {x: 560, y: 560}, {x: 500, y: 560}, {x: 440, y: 560}, {x: 380, y: 560},
+      {x: 320, y: 560}, {x: 260, y: 560}, {x: 200, y: 560}, {x: 140, y: 560},
+      {x: 80, y: 560}, {x: 20, y: 560}, {x: 0, y: 500}, {x: 0, y: 440}, {x: 0, y: 380},
+      {x: 0, y: 320}, {x: 0, y: 260}, {x: 0, y: 200}, {x: 0, y: 140}, {x: 0, y: 80},
+      {x: 0, y: 20}, {x: 0, y: 0}, {x: 60, y: 0}, {x: 120, y: 0}, {x: 180, y: 0},
+      {x: 240, y: 0}, {x: 300, y: 0}, {x: 360, y: 0}, {x: 420, y: 0}, {x: 480, y: 0},
+      {x: 540, y: 0}, {x: 560, y: 0}, {x: 580, y: 60}, {x: 580, y: 120}, {x: 580, y: 180},
+      {x: 580, y: 240}, {x: 580, y: 300}, {x: 580, y: 360}, {x: 580, y: 420}, {x: 580, y: 480},
+      {x: 580, y: 540}, {x: 560, y: 560}
+    ];
 
-// প্রাথমিক অবস্থান
-movePlayer();
+    const placeNames = [
+      "Start", "Mediterranean Avenue", "Community Chest", "Baltic Avenue", 
+      "Income Tax", "Reading Railroad", "Oriental Avenue", "Chance", 
+      "Vermont Avenue", "Connecticut Avenue", "Jail / Just Visiting", 
+      "St. Charles Place", "Electric Company", "States Avenue", "Virginia Avenue", 
+      "Pennsylvania Railroad", "St. James Place", "Community Chest", "Tennessee Avenue", 
+      "New York Avenue", "Free Parking", "Kentucky Avenue", "Chance", "Indiana Avenue", 
+      "Illinois Avenue", "B&O Railroad", "Atlantic Avenue", "Ventnor Avenue", 
+      "Water Works", "Marvin Gardens", "Go To Jail", "Pacific Avenue", 
+      "North Carolina Avenue", "Community Chest", "Pennsylvania Avenue", 
+      "Short Line", "Chance", "Park Place", "Luxury Tax", "Boardwalk"
+    ];
 
-// ডাইস রোল
-document.getElementById('dice').addEventListener('click', () => {
-  const dice = Math.floor(Math.random()*6)+1;
-  document.getElementById('diceNum').textContent = dice;
+    let playerPos = [0, 0, 0, 0];
+    let currentPlayer = 0;
 
-  playerPos += dice;
-  if(playerPos >= positions.length) playerPos -= positions.length;
+    const players = [document.getElementById('player1'), document.getElementById('player2'), 
+                     document.getElementById('player3'), document.getElementById('player4')];
+    const infoBox = document.getElementById('info');
+    const statusBox = document.getElementById('status');
 
-  movePlayer();
-});
-</script>
+    function movePlayer() {
+      players.forEach((player, index) => {
+        const pos = positions[playerPos[index]];
+        player.style.left = pos.x + 'px';
+        player.style.top = pos.y + 'px';
+      });
+    }
+
+    function updateInfo() {
+      infoBox.innerHTML = `ডাইস রোল: <span id="diceNum">${document.getElementById('diceNum').textContent}</span> <br> আপনি ${placeNames[playerPos[currentPlayer]]}-এ আছেন।`;
+    }
+
+    document.getElementById('dice').addEventListener('click', () => {
+      const dice = Math.floor(Math.random() * 6) + 1;
+      document.getElementById('diceNum').textContent = dice;
+
+      playerPos[currentPlayer] += dice;
+      if (playerPos[currentPlayer] >= positions.length) playerPos[currentPlayer] -= positions.length;
+
+      movePlayer();
+      updateInfo();
+      currentPlayer = (currentPlayer + 1) % 4;
+      statusBox.textContent = `পরবর্তী খেলোয়াড়: ${currentPlayer + 1}`;
+    });
+
+  </script>
 
 </body>
 </html>
