@@ -4,20 +4,28 @@
 <meta charset="UTF-8">
 <title>মনোপলি স্টাইল গেম</title>
 <style>
-  body { font-family: Arial, sans-serif; text-align: center; background: #f5f5f5; }
-  #board { 
-    display: grid; 
-    grid-template-columns: repeat(11, 50px); 
-    grid-template-rows: repeat(11, 50px); 
-    gap: 2px; 
-    margin: 20px auto; 
-    width: max-content; 
+  body { font-family: Arial, sans-serif; text-align: center; background: #f0f0f0; }
+  #board {
+    display: grid;
+    grid-template-columns: repeat(11, 60px);
+    grid-template-rows: repeat(11, 60px);
+    gap: 2px;
+    margin: 20px auto;
+    width: max-content;
   }
-  .cell { border: 1px solid #333; background: #fff; display: flex; align-items: center; justify-content: center; position: relative; font-size: 10px; }
-  .player { width: 15px; height: 15px; border-radius: 50%; position: absolute; top: 5px; left: 5px; }
-  .player1 { background: red; }
-  #dice { font-size: 20px; margin: 15px; padding: 10px 20px; }
-  #info { margin-top: 15px; }
+  .cell {
+    border: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    position: relative;
+    flex-direction: column;
+    padding: 2px;
+  }
+  .player { width: 15px; height: 15px; border-radius: 50%; position: absolute; bottom: 5px; right: 5px; background: red; }
+  #dice { font-size: 16px; padding: 10px 20px; margin: 15px; cursor: pointer; }
+  #info { margin-top: 10px; font-size: 14px; }
 </style>
 </head>
 <body>
@@ -25,44 +33,86 @@
 <h1>মনোপলি স্টাইল গেম</h1>
 
 <div id="board"></div>
-
 <button id="dice">ডাইস নাড়ুন</button>
 <div id="info">ডাইস রোল: <span id="diceNum">0</span></div>
 
 <script>
-const boardSize = 11; // 11x11 grid
-const totalCells = 40; // প্রায় 40 ঘরের মতো
 const board = document.getElementById('board');
-let cells = [];
-let playerPos = 0;
+const totalCells = 40;
 
-// বোর্ড তৈরি
-for (let i = 0; i < boardSize; i++) {
-  for (let j = 0; j < boardSize; j++) {
-    const cell = document.createElement('div');
-    cell.classList.add('cell');
-    board.appendChild(cell);
-    cells.push(cell);
-  }
+// মনোপলি ঘরের নাম এবং কালার (প্রোপার্টি কালার)
+const properties = [
+  {name:'Start', color:'#fff'},
+  {name:'বাংলা স্ট্রীট', color:'#8B0000'},
+  {name:'চান্স', color:'#FFD700'},
+  {name:'রূপালি রোড', color:'#8B0000'},
+  {name:'কমিউনিটি', color:'#00CED1'},
+  {name:'নীল বাজার', color:'#0000FF'},
+  {name:'চান্স', color:'#FFD700'},
+  {name:'সবুজ গলি', color:'#006400'},
+  {name:'প্রোপার্টি 8', color:'#006400'},
+  {name:'জেল', color:'#808080'},
+  {name:'প্রোপার্টি 10', color:'#FFA500'},
+  {name:'প্রোপার্টি 11', color:'#FFA500'},
+  {name:'চান্স', color:'#FFD700'},
+  {name:'প্রোপার্টি 12', color:'#FFA500'},
+  {name:'প্রোপার্টি 13', color:'#00CED1'},
+  {name:'চান্স', color:'#FFD700'},
+  {name:'প্রোপার্টি 14', color:'#00CED1'},
+  {name:'প্রোপার্টি 15', color:'#00CED1'},
+  {name:'প্রোপার্টি 16', color:'#FF69B4'},
+  {name:'ফিনিশ', color:'#fff'},
+  {name:'প্রোপার্টি 18', color:'#FF69B4'},
+  {name:'প্রোপার্টি 19', color:'#FF69B4'},
+  {name:'চান্স', color:'#FFD700'},
+  {name:'প্রোপার্টি 20', color:'#8B0000'},
+  {name:'প্রোপার্টি 21', color:'#8B0000'},
+  {name:'কমিউনিটি', color:'#00CED1'},
+  {name:'প্রোপার্টি 22', color:'#0000FF'},
+  {name:'চান্স', color:'#FFD700'},
+  {name:'প্রোপার্টি 23', color:'#0000FF'},
+  {name:'প্রোপার্টি 24', color:'#006400'},
+  {name:'চান্স', color:'#FFD700'},
+  {name:'প্রোপার্টি 25', color:'#006400'},
+  {name:'প্রোপার্টি 26', color:'#FFA500'},
+  {name:'চান্স', color:'#FFD700'},
+  {name:'প্রোপার্টি 27', color:'#FFA500'},
+  {name:'প্রোপার্টি 28', color:'#FF69B4'},
+  {name:'চান্স', color:'#FFD700'},
+  {name:'প্রোপার্টি 29', color:'#FF69B4'},
+  {name:'প্রোপার্টি 30', color:'#00CED1'},
+  {name:'জেল', color:'#808080'}
+];
+
+// বোর্ডে ঘর তৈরি
+const cells = [];
+for(let i=0; i<totalCells; i++){
+  const cell = document.createElement('div');
+  cell.classList.add('cell');
+  cell.style.backgroundColor = properties[i].color;
+  cell.textContent = properties[i].name;
+  board.appendChild(cell);
+  cells.push(cell);
 }
 
 // খেলোয়াড় গুটি
+let playerPos = 0;
 const player = document.createElement('div');
-player.classList.add('player','player1');
+player.classList.add('player');
 cells[playerPos].appendChild(player);
 
-// ডাইস রোল
+// ডাইস বাটন
 document.getElementById('dice').addEventListener('click', () => {
   const dice = Math.floor(Math.random()*6)+1;
   document.getElementById('diceNum').textContent = dice;
-  
+
   // পুরানো পজিশন থেকে সরানো
-  if (player.parentNode) player.parentNode.removeChild(player);
-  
+  if(player.parentNode) player.parentNode.removeChild(player);
+
   // নতুন পজিশনে স্থানান্তর
   playerPos += dice;
-  if (playerPos >= totalCells) playerPos -= totalCells;
-  
+  if(playerPos >= totalCells) playerPos -= totalCells;
+
   cells[playerPos].appendChild(player);
 });
 </script>
