@@ -2,117 +2,106 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<title>হুবহু মনোপলি বোর্ড</title>
+<title>মনোপলি বোর্ড প্রোটোটাইপ</title>
 <style>
 body { font-family: Arial, sans-serif; text-align: center; background: #f0f0f0; }
 #board {
-  display: grid;
-  grid-template-columns: repeat(11, 60px);
-  grid-template-rows: repeat(11, 60px);
-  gap: 2px;
+  width: 600px;             /* ছবি অনুযায়ী পরিবর্তন করো */
+  height: 600px;
   margin: 20px auto;
-  width: max-content;
-}
-.cell {
-  border: 1px solid #333;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 9px;
-  text-align: center;
-  padding: 2px;
+  background-image: url('https://static-01.daraz.com.bd/p/aba8495ed13118c2fc58119f5882750d.jpg'); /* এখানে তোমার ছবি রাখবে */
+  background-size: cover;
+  background-position: center;
   position: relative;
+  border: 2px solid #333;
 }
-.player { width: 15px; height: 15px; border-radius: 50%; position: absolute; bottom: 5px; right: 5px; background: red; }
+.player {
+  width: 20px;
+  height: 20px;
+  background: red;
+  border-radius: 50%;
+  position: absolute;
+  transition: all 0.5s ease; /* smooth movement */
+}
 #dice { font-size: 16px; padding: 10px 20px; margin: 15px; cursor: pointer; }
 #info { margin-top: 10px; font-size: 14px; }
-.icon { font-size: 16px; margin-bottom: 2px; }
 </style>
 </head>
 <body>
 
-<h1>হুবহু মনোপলি বোর্ড</h1>
-<div id="board"></div>
+<h1>মনোপলি বোর্ড প্রোটোটাইপ</h1>
+<div id="board">
+  <div id="player" class="player"></div>
+</div>
 <button id="dice">ডাইস নাড়ুন</button>
 <div id="info">ডাইস রোল: <span id="diceNum">0</span></div>
 
 <script>
-// মোট 40 ঘর, মূল মনোপলি লেআউট
-const properties = [
-  {name:"GO", color:"#ffffff", icon:"➡️"},
-  {name:"Mediterranean Avenue", color:"#8B4513", icon:"🏠"},
-  {name:"Community Chest", color:"#ffffff", icon:"💰"},
-  {name:"Baltic Avenue", color:"#8B4513", icon:"🏠"},
-  {name:"Income Tax", color:"#ffffff", icon:"💵"},
-  {name:"Reading Railroad", color:"#000000", icon:"🚂"},
-  {name:"Oriental Avenue", color:"#ADD8E6", icon:"🏠"},
-  {name:"Chance", color:"#ffffff", icon:"❓"},
-  {name:"Vermont Avenue", color:"#ADD8E6", icon:"🏠"},
-  {name:"Connecticut Avenue", color:"#ADD8E6", icon:"🏠"},
-  {name:"Jail / Just Visiting", color:"#808080", icon:"🚔"},
-  {name:"St. Charles Place", color:"#FF69B4", icon:"🏠"},
-  {name:"Electric Company", color:"#ffffff", icon:"💡"},
-  {name:"States Avenue", color:"#FF69B4", icon:"🏠"},
-  {name:"Virginia Avenue", color:"#FF69B4", icon:"🏠"},
-  {name:"Pennsylvania Railroad", color:"#000000", icon:"🚂"},
-  {name:"St. James Place", color:"#FFA500", icon:"🏠"},
-  {name:"Community Chest", color:"#ffffff", icon:"💰"},
-  {name:"Tennessee Avenue", color:"#FFA500", icon:"🏠"},
-  {name:"New York Avenue", color:"#FFA500", icon:"🏠"},
-  {name:"Free Parking", color:"#ffffff", icon:"🅿️"},
-  {name:"Kentucky Avenue", color:"#FF0000", icon:"🏠"},
-  {name:"Chance", color:"#ffffff", icon:"❓"},
-  {name:"Indiana Avenue", color:"#FF0000", icon:"🏠"},
-  {name:"Illinois Avenue", color:"#FF0000", icon:"🏠"},
-  {name:"B&O Railroad", color:"#000000", icon:"🚂"},
-  {name:"Atlantic Avenue", color:"#FFFF00", icon:"🏠"},
-  {name:"Ventnor Avenue", color:"#FFFF00", icon:"🏠"},
-  {name:"Water Works", color:"#ffffff", icon:"💧"},
-  {name:"Marvin Gardens", color:"#FFFF00", icon:"🏠"},
-  {name:"Go To Jail", color:"#808080", icon:"🚔"},
-  {name:"Pacific Avenue", color:"#008000", icon:"🏠"},
-  {name:"North Carolina Avenue", color:"#008000", icon:"🏠"},
-  {name:"Community Chest", color:"#ffffff", icon:"💰"},
-  {name:"Pennsylvania Avenue", color:"#008000", icon:"🏠"},
-  {name:"Short Line", color:"#000000", icon:"🚂"},
-  {name:"Chance", color:"#ffffff", icon:"❓"},
-  {name:"Park Place", color:"#0000FF", icon:"🏠"},
-  {name:"Luxury Tax", color:"#ffffff", icon:"💰"},
-  {name:"Boardwalk", color:"#0000FF", icon:"🏠"}
+// প্রতিটি ঘরের x,y কো-অর্ডিনেট (600px board ধরছি)
+const positions = [
+  {x: 560, y: 560}, // Start (নিচের ডান কোণ)
+  {x: 500, y: 560}, // Mediterranean Avenue
+  {x: 440, y: 560}, // Community Chest
+  {x: 380, y: 560}, // Baltic Avenue
+  {x: 320, y: 560}, // Income Tax
+  {x: 260, y: 560}, // Reading Railroad
+  {x: 200, y: 560}, // Oriental Avenue
+  {x: 140, y: 560}, // Chance
+  {x: 80, y: 560},  // Vermont Avenue
+  {x: 20, y: 560},  // Connecticut Avenue
+  {x: 0, y: 500},   // Jail / Just Visiting
+  {x: 0, y: 440},   // St. Charles Place
+  {x: 0, y: 380},   // Electric Company
+  {x: 0, y: 320},   // States Avenue
+  {x: 0, y: 260},   // Virginia Avenue
+  {x: 0, y: 200},   // Pennsylvania Railroad
+  {x: 0, y: 140},   // St. James Place
+  {x: 0, y: 80},    // Community Chest
+  {x: 0, y: 20},    // Tennessee Avenue
+  {x: 0, y: 0},     // New York Avenue (উপরে বাম)
+  {x: 60, y: 0},    // Free Parking
+  {x: 120, y: 0},   // Kentucky Avenue
+  {x: 180, y: 0},   // Chance
+  {x: 240, y: 0},   // Indiana Avenue
+  {x: 300, y: 0},   // Illinois Avenue
+  {x: 360, y: 0},   // B&O Railroad
+  {x: 420, y: 0},   // Atlantic Avenue
+  {x: 480, y: 0},   // Ventnor Avenue
+  {x: 540, y: 0},   // Water Works
+  {x: 560, y: 0},   // Marvin Gardens
+  {x: 580, y: 60},  // Go To Jail
+  {x: 580, y: 120}, // Pacific Avenue
+  {x: 580, y: 180}, // North Carolina Avenue
+  {x: 580, y: 240}, // Community Chest
+  {x: 580, y: 300}, // Pennsylvania Avenue
+  {x: 580, y: 360}, // Short Line
+  {x: 580, y: 420}, // Chance
+  {x: 580, y: 480}, // Park Place
+  {x: 580, y: 540}, // Luxury Tax
+  {x: 560, y: 560}  // Boardwalk (ফিরে Start)
 ];
 
-// বোর্ডে ঘর তৈরি
-const board = document.getElementById('board');
-const cells = [];
-for(let i=0;i<properties.length;i++){
-  const cell = document.createElement('div');
-  cell.classList.add('cell');
-  cell.style.backgroundColor = properties[i].color;
-  cell.innerHTML = `<div class="icon">${properties[i].icon}</div>${properties[i].name}`;
-  board.appendChild(cell);
-  cells.push(cell);
+let playerPos = 0;
+const player = document.getElementById('player');
+
+function movePlayer() {
+  const pos = positions[playerPos];
+  player.style.left = pos.x + 'px';
+  player.style.top = pos.y + 'px';
 }
 
-// খেলোয়াড় গুটি
-let playerPos = 0;
-const player = document.createElement('div');
-player.classList.add('player');
-cells[playerPos].appendChild(player);
+// প্রাথমিক অবস্থান
+movePlayer();
 
 // ডাইস রোল
 document.getElementById('dice').addEventListener('click', () => {
   const dice = Math.floor(Math.random()*6)+1;
   document.getElementById('diceNum').textContent = dice;
-  
-  // পুরানো পজিশন থেকে সরানো
-  if(player.parentNode) player.parentNode.removeChild(player);
-  
-  // নতুন পজিশনে স্থানান্তর
+
   playerPos += dice;
-  if(playerPos >= cells.length) playerPos -= cells.length;
-  
-  cells[playerPos].appendChild(player);
+  if(playerPos >= positions.length) playerPos -= positions.length;
+
+  movePlayer();
 });
 </script>
 
