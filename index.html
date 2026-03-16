@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<title>মনোপলি অনলাইন</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; background: #f2f2f2; }
+  #board { display: grid; grid-template-columns: repeat(5, 100px); grid-gap: 5px; margin: 20px auto; }
+  .cell { width: 100px; height: 100px; background: #fff; border: 1px solid #000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+  #info { margin-top: 20px; }
+  button { padding: 10px 20px; font-size: 16px; }
+</style>
+</head>
+<body>
+
+<h1>মনোপলি অনলাইন (বেসিক)</h1>
+
+<div id="board">
+  <div class="cell" data-pos="0">Start</div>
+  <div class="cell" data-pos="1">প্রোপার্টি 1</div>
+  <div class="cell" data-pos="2">প্রোপার্টি 2</div>
+  <div class="cell" data-pos="3">চান্স</div>
+  <div class="cell" data-pos="4">প্রোপার্টি 3</div>
+  <div class="cell" data-pos="5">প্রোপার্টি 4</div>
+  <div class="cell" data-pos="6">প্রোপার্টি 5</div>
+  <div class="cell" data-pos="7">চান্স</div>
+  <div class="cell" data-pos="8">প্রোপার্টি 6</div>
+  <div class="cell" data-pos="9">প্রোপার্টি 7</div>
+  <div class="cell" data-pos="10">প্রোপার্টি 8</div>
+  <div class="cell" data-pos="11">চান্স</div>
+  <div class="cell" data-pos="12">প্রোপার্টি 9</div>
+  <div class="cell" data-pos="13">প্রোপার্টি 10</div>
+  <div class="cell" data-pos="14">প্রোপার্টি 11</div>
+  <div class="cell" data-pos="15">চান্স</div>
+  <div class="cell" data-pos="16">প্রোপার্টি 12</div>
+  <div class="cell" data-pos="17">প্রোপার্টি 13</div>
+  <div class="cell" data-pos="18">প্রোপার্টি 14</div>
+  <div class="cell" data-pos="19">Finish</div>
+</div>
+
+<div id="info">
+  <p>Player Position: <span id="playerPos">0</span></p>
+  <p>Player Money: $<span id="playerMoney">1500</span></p>
+  <button id="rollDice">ডাইস নাড়ুন</button>
+</div>
+
+<script>
+let playerPos = 0;
+let playerMoney = 1500;
+
+const cells = document.querySelectorAll('.cell');
+const playerPosEl = document.getElementById('playerPos');
+const playerMoneyEl = document.getElementById('playerMoney');
+
+document.getElementById('rollDice').addEventListener('click', () => {
+  const dice = Math.floor(Math.random() * 6) + 1;
+  alert(`আপনি ${dice} পেয়েছেন!`);
+  
+  playerPos += dice;
+  if (playerPos >= cells.length) playerPos -= cells.length; // রাউন্ড সম্পূর্ণ হলে ফেরানো
+
+  playerPosEl.textContent = playerPos;
+
+  const cell = cells[playerPos].textContent;
+
+  if (cell.includes('প্রোপার্টি')) {
+    playerMoney -= 50; // প্রোপার্টি ক্রয়ের জন্য ৫০ ডলার
+    alert(`আপনি ${cell} ক্রয় করেছেন! $50 কেটে গেছে`);
+  } else if (cell.includes('চান্স')) {
+    const chance = Math.random() < 0.5 ? -100 : 100;
+    playerMoney += chance;
+    alert(`চান্স! আপনার টাকা ${(chance > 0 ? 'বাড়ল' : 'হ্রাস পেল')} $${Math.abs(chance)}`);
+  }
+
+  playerMoneyEl.textContent = playerMoney;
+});
+</script>
+
+</body>
+</html>
